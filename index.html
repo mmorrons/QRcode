@@ -2,258 +2,110 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Customizable QR Code Generator with Logo</title>
-  <!-- Include QRCode.js from CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    label {
-      font-weight: bold;
-    }
-    input, select, button {
-      margin: 5px 0;
-      padding: 5px;
-    }
-    #canvas {
-      margin-top: 20px;
-      border: 1px solid #ccc;
-    }
-    #downloadBtn {
-      margin-top: 10px;
-    }
-    #languageSelector {
-      margin-bottom: 20px;
-    }
-  </style>
+  <title>Customizable QR Code Generator</title>
+  <!-- Materialize CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Google Fonts: Roboto -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- QR Code Styling Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 </head>
 <body>
-  <!-- Language selector -->
-  <div id="languageSelector">
-    <label for="languageSelect">Language / Lingua:</label>
-    <select id="languageSelect">
-      <option value="en">English</option>
-      <option value="it">Italiano</option>
-    </select>
+  <nav>
+    <div class="nav-wrapper blue">
+      <a href="#" class="brand-logo center">QR Code Generator</a>
+      <ul id="nav-mobile" class="left hide-on-med-and-down">
+        <li>
+          <div class="input-field" style="margin: 0; padding: 0 10px;">
+            <select id="languageSelect">
+              <option value="en" selected>English</option>
+              <option value="it">Italiano</option>
+            </select>
+            <label>Language / Lingua</label>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h4 id="pageTitle">Customizable QR Code Generator with Logo</h4>
+    <div class="row">
+      <form class="col s12" id="qrForm">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="urlInput" type="text" required>
+            <label for="urlInput" id="urlLabel">URL</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input id="sizeInput" type="number" value="300" min="100" max="1000">
+            <label for="sizeInput" id="sizeLabel">QR Code Size (px)</label>
+          </div>
+          <div class="input-field col s6">
+            <select id="formatSelect">
+              <option value="png" selected>PNG</option>
+              <option value="jpg">JPG</option>
+              <option value="svg">SVG</option>
+            </select>
+            <label for="formatSelect" id="formatLabel">Output Format</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input id="colorDarkInput" type="text" value="#000000">
+            <label for="colorDarkInput" id="colorDarkLabel">Dark Color (hex)</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="colorLightInput" type="text" value="#ffffff">
+            <label for="colorLightInput" id="colorLightLabel">Light Color (hex)</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <select id="errorCorrectionSelect">
+              <option value="L">L (7%)</option>
+              <option value="M">M (15%)</option>
+              <option value="Q">Q (25%)</option>
+              <option value="H" selected>H (30%)</option>
+            </select>
+            <label for="errorCorrectionSelect" id="errorCorrectionLabel">Error Correction Level</label>
+          </div>
+          <div class="input-field col s6">
+            <input id="logoScaleInput" type="number" value="20" min="5" max="50">
+            <label for="logoScaleInput" id="logoScaleLabel">Logo Scale (% of QR)</label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="file-field input-field col s12">
+            <div class="btn">
+              <span id="logoBtnLabel">Select Logo (optional)</span>
+              <input type="file" id="logoInput" accept="image/*">
+            </div>
+            <div class="file-path-wrapper">
+              <input class="file-path validate" type="text">
+            </div>
+          </div>
+        </div>
+        <div class="row center">
+          <button type="button" id="generateBtn" class="btn-large blue">Generate QR Code</button>
+          <button type="button" id="downloadBtn" class="btn-large green" style="display: none;">Download QR Code</button>
+        </div>
+      </form>
+    </div>
+    <div class="row" id="qrContainer">
+      <!-- The QR code will be rendered here -->
+    </div>
   </div>
 
-  <h1 id="title">Customizable QR Code Generator with Optional Logo</h1>
-
-  <form id="qrForm">
-    <div>
-      <label id="urlLabel" for="urlInput">URL:</label>
-      <input type="text" id="urlInput" placeholder="Enter URL here" size="50" required>
-    </div>
-    <div>
-      <label id="sizeLabel" for="sizeInput">QR Code Size (px):</label>
-      <input type="number" id="sizeInput" value="256" min="100" max="1000">
-    </div>
-    <div>
-      <label id="colorDarkLabel" for="colorDarkInput">Dark Color:</label>
-      <input type="color" id="colorDarkInput" value="#000000">
-    </div>
-    <div>
-      <label id="colorLightLabel" for="colorLightInput">Light Color:</label>
-      <input type="color" id="colorLightInput" value="#ffffff">
-    </div>
-    <div>
-      <label id="errorCorrectionLabel" for="correctionInput">Error Correction Level:</label>
-      <select id="correctionInput">
-        <option value="L">L (7%)</option>
-        <option value="M">M (15%)</option>
-        <option value="Q">Q (25%)</option>
-        <option value="H" selected>H (30%)</option>
-      </select>
-    </div>
-    <div>
-      <label id="logoScaleLabel" for="logoScaleInput">Logo Scale (% of QR):</label>
-      <input type="number" id="logoScaleInput" value="20" min="5" max="50">
-    </div>
-    <div>
-      <label id="whiteBoxFactorLabel" for="whiteBoxFactorInput">White Box Factor:</label>
-      <input type="number" id="whiteBoxFactorInput" value="1.2" step="0.1" min="1" max="2">
-    </div>
-    <div>
-      <label id="logoLabel" for="logoInput">Select Logo (optional):</label>
-      <input type="file" id="logoInput" accept="image/*">
-    </div>
-    <br>
-    <button type="button" id="generateBtn">Generate QR Code</button>
-    <button type="button" id="downloadBtn" style="display: none;">Download QR Code</button>
-  </form>
-
-  <!-- Hidden container for QR code generation -->
-  <div id="qrcode" style="display: none;"></div>
-  <!-- Canvas where the final QR code will be drawn -->
-  <canvas id="canvas"></canvas>
-
-  <script>
-    // Language texts
-    var texts = {
-      en: {
-        title: "Customizable QR Code Generator with Optional Logo",
-        urlLabel: "URL:",
-        urlPlaceholder: "Enter URL here",
-        sizeLabel: "QR Code Size (px):",
-        colorDarkLabel: "Dark Color:",
-        colorLightLabel: "Light Color:",
-        errorCorrectionLabel: "Error Correction Level:",
-        errorCorrectionOptions: {
-          L: "L (7%)",
-          M: "M (15%)",
-          Q: "Q (25%)",
-          H: "H (30%)"
-        },
-        logoScaleLabel: "Logo Scale (% of QR):",
-        whiteBoxFactorLabel: "White Box Factor:",
-        logoLabel: "Select Logo (optional):",
-        generateBtn: "Generate QR Code",
-        downloadBtn: "Download QR Code",
-        urlEmptyAlert: "Please enter a URL.",
-        errorGeneratingQR: "Error generating QR code."
-      },
-      it: {
-        title: "Generatore di QR Code personalizzabile con logo opzionale",
-        urlLabel: "URL:",
-        urlPlaceholder: "Inserisci URL qui",
-        sizeLabel: "Dimensione QR Code (px):",
-        colorDarkLabel: "Colore Scuro:",
-        colorLightLabel: "Colore Chiaro:",
-        errorCorrectionLabel: "Livello di Correzione:",
-        errorCorrectionOptions: {
-          L: "L (7%)",
-          M: "M (15%)",
-          Q: "Q (25%)",
-          H: "H (30%)"
-        },
-        logoScaleLabel: "Scala del logo (% del QR):",
-        whiteBoxFactorLabel: "Fattore della casella bianca:",
-        logoLabel: "Seleziona logo (opzionale):",
-        generateBtn: "Genera QR Code",
-        downloadBtn: "Scarica QR Code",
-        urlEmptyAlert: "Inserisci un URL.",
-        errorGeneratingQR: "Errore nella generazione del QR code."
-      }
-    };
-
-    var currentLang = 'en';
-
-    // Function to update UI texts based on selected language
-    function updateLanguage() {
-      currentLang = document.getElementById('languageSelect').value;
-      var t = texts[currentLang];
-      
-      document.getElementById('title').textContent = t.title;
-      document.getElementById('urlLabel').textContent = t.urlLabel;
-      document.getElementById('urlInput').placeholder = t.urlPlaceholder;
-      document.getElementById('sizeLabel').textContent = t.sizeLabel;
-      document.getElementById('colorDarkLabel').textContent = t.colorDarkLabel;
-      document.getElementById('colorLightLabel').textContent = t.colorLightLabel;
-      document.getElementById('errorCorrectionLabel').textContent = t.errorCorrectionLabel;
-      
-      // Update error correction dropdown options
-      var correctionSelect = document.getElementById('correctionInput');
-      correctionSelect.options[0].text = t.errorCorrectionOptions.L;
-      correctionSelect.options[1].text = t.errorCorrectionOptions.M;
-      correctionSelect.options[2].text = t.errorCorrectionOptions.Q;
-      correctionSelect.options[3].text = t.errorCorrectionOptions.H;
-      
-      document.getElementById('logoScaleLabel').textContent = t.logoScaleLabel;
-      document.getElementById('whiteBoxFactorLabel').textContent = t.whiteBoxFactorLabel;
-      document.getElementById('logoLabel').textContent = t.logoLabel;
-      document.getElementById('generateBtn').textContent = t.generateBtn;
-      document.getElementById('downloadBtn').textContent = t.downloadBtn;
-    }
-
-    // Initialize language on page load and on change
-    document.getElementById('languageSelect').addEventListener('change', updateLanguage);
-    updateLanguage();
-
-    // Generate QR Code with customization and optional logo
-    document.getElementById('generateBtn').addEventListener('click', function () {
-      var t = texts[currentLang];
-      var url = document.getElementById('urlInput').value.trim();
-      if (!url) {
-        alert(t.urlEmptyAlert);
-        return;
-      }
-      
-      var size = parseInt(document.getElementById('sizeInput').value) || 256;
-      var colorDark = document.getElementById('colorDarkInput').value;
-      var colorLight = document.getElementById('colorLightInput').value;
-      var correction = document.getElementById('correctionInput').value;
-      var logoScalePercent = parseInt(document.getElementById('logoScaleInput').value) || 20;
-      var whiteBoxFactor = parseFloat(document.getElementById('whiteBoxFactorInput').value) || 1.2;
-      
-      // Clear previous QR code and canvas
-      document.getElementById('qrcode').innerHTML = "";
-      var canvas = document.getElementById('canvas');
-      var ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      document.getElementById('downloadBtn').style.display = "none";
-
-      // Generate QR code in a hidden div
-      var qrContainer = document.getElementById('qrcode');
-      qrContainer.style.display = "block";
-      var qr = new QRCode(qrContainer, {
-        text: url,
-        width: size,
-        height: size,
-        colorDark: colorDark,
-        colorLight: colorLight,
-        correctLevel: QRCode.CorrectLevel[correction]
-      });
-
-      // Allow time for QR code to render
-      setTimeout(function () {
-        var qrImg = qrContainer.querySelector('img');
-        if (!qrImg) {
-          alert(t.errorGeneratingQR);
-          return;
-        }
-        canvas.width = qrImg.width;
-        canvas.height = qrImg.height;
-        ctx.drawImage(qrImg, 0, 0);
-
-        // Check if a logo file was provided
-        var file = document.getElementById('logoInput').files[0];
-        if (file) {
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            var logoImg = new Image();
-            logoImg.onload = function () {
-              var logoSize = canvas.width * (logoScalePercent / 100);
-              var logoX = (canvas.width - logoSize) / 2;
-              var logoY = (canvas.height - logoSize) / 2;
-              var whiteBoxSize = logoSize * whiteBoxFactor;
-              var whiteX = (canvas.width - whiteBoxSize) / 2;
-              var whiteY = (canvas.height - whiteBoxSize) / 2;
-              ctx.fillStyle = "#ffffff";
-              ctx.fillRect(whiteX, whiteY, whiteBoxSize, whiteBoxSize);
-              ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
-              qrContainer.style.display = "none";
-              document.getElementById('downloadBtn').style.display = "inline";
-            };
-            logoImg.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        } else {
-          qrContainer.style.display = "none";
-          document.getElementById('downloadBtn').style.display = "inline";
-        }
-      }, 500);
-    });
-
-    // Enable downloading of the QR code image from the canvas
-    document.getElementById('downloadBtn').addEventListener('click', function () {
-      var canvas = document.getElementById('canvas');
-      var link = document.createElement('a');
-      link.download = "qrcode.png";
-      link.href = canvas.toDataURL();
-      link.click();
-    });
-  </script>
+  <!-- jQuery (required for Materialize) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Materialize JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <!-- Custom JS -->
+  <script src="main.js"></script>
 </body>
 </html>
