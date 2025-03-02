@@ -2,6 +2,9 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+.btn {
+  border-radius: 20px;
+}
 .container {
   margin-top: 30px;
 }
